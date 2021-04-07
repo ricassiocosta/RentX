@@ -1,4 +1,5 @@
 import { RentalsRepositoryInMemory } from '@modules/rentals/repositories/in-memory/RentalsRepositoryInMemory';
+import dayjs from 'dayjs';
 
 import { AppError } from '@shared/errors/AppError';
 
@@ -7,6 +8,7 @@ import { CreateRentalUseCase } from './CreateRentalUseCase';
 let createRentalUseCase: CreateRentalUseCase;
 let rentalsRepositoryInMemory: RentalsRepositoryInMemory;
 describe('Create rental', () => {
+  const add24Hours = dayjs().add(1, 'day').toDate();
   beforeEach(() => {
     rentalsRepositoryInMemory = new RentalsRepositoryInMemory();
     createRentalUseCase = new CreateRentalUseCase(rentalsRepositoryInMemory);
@@ -16,7 +18,7 @@ describe('Create rental', () => {
     await createRentalUseCase.execute({
       user_id: 'user_1_id',
       car_id: 'car_1_id',
-      expected_return_date: new Date(),
+      expected_return_date: add24Hours,
     });
 
     const rental = await rentalsRepositoryInMemory.findOpenRentalByCarId(
@@ -32,13 +34,13 @@ describe('Create rental', () => {
       await createRentalUseCase.execute({
         user_id: 'user_2_id',
         car_id: 'car_2_id',
-        expected_return_date: new Date(),
+        expected_return_date: add24Hours,
       });
 
       await createRentalUseCase.execute({
         user_id: 'user_2_id',
         car_id: 'car_3_id',
-        expected_return_date: new Date(),
+        expected_return_date: add24Hours,
       });
     }).rejects.toBeInstanceOf(AppError);
   });
@@ -48,9 +50,19 @@ describe('Create rental', () => {
       await createRentalUseCase.execute({
         user_id: 'user_3_id',
         car_id: 'car_4_id',
-        expected_return_date: new Date(),
+        expected_return_date: add24Hours,
       });
 
+      await createRentalUseCase.execute({
+        user_id: 'user_4_id',
+        car_id: 'car_4_id',
+        expected_return_date: add24Hours,
+      });
+    }).rejects.toBeInstanceOf(AppError);
+  });
+
+  it('should only to be able to rent a car for at least for 24 hours', async () => {
+    expect(async () => {
       await createRentalUseCase.execute({
         user_id: 'user_4_id',
         car_id: 'car_4_id',
