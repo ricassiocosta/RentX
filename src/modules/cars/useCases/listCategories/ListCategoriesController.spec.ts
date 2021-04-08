@@ -1,4 +1,5 @@
 import { hash } from 'bcrypt';
+import delay from 'delay';
 import request from 'supertest';
 import { Connection, createConnection, getConnectionOptions } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -6,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 import { app } from '@shared/infra/http/app';
 
 let connection: Connection;
-describe('Create category controller', () => {
+describe('List categories', () => {
   beforeAll(async () => {
     const defaultOptions = await getConnectionOptions();
     connection = await createConnection(
@@ -32,7 +33,7 @@ describe('Create category controller', () => {
     await connection.close();
   });
 
-  it('should be able to create a new category', async () => {
+  it('should be able to list all categories', async () => {
     let response = await request(app).post('/sessions').send({
       email: 'admin@rentx.com',
       password: 'admin',
@@ -40,7 +41,7 @@ describe('Create category controller', () => {
 
     const { token } = response.body;
 
-    response = await request(app)
+    await request(app)
       .post('/categories')
       .send({
         name: 'category 1 name',
@@ -50,27 +51,21 @@ describe('Create category controller', () => {
         Authorization: `Bearer ${token}`,
       });
 
-    expect(response.status).toBe(201);
-  });
-
-  it('should not be able to create a duplicated category', async () => {
-    let response = await request(app).post('/sessions').send({
-      email: 'admin@rentx.com',
-      password: 'admin',
-    });
-
-    const { token } = response.body;
-
-    response = await request(app)
+    await request(app)
       .post('/categories')
       .send({
-        name: 'category 1 name',
-        description: 'category 1 description',
+        name: 'category 2 name',
+        description: 'category 2 description',
       })
       .set({
         Authorization: `Bearer ${token}`,
       });
 
-    expect(response.status).toBe(400);
+    await delay(100);
+
+    response = await request(app).get('/categories');
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(2);
   });
 });
