@@ -1,3 +1,15 @@
-import { createConnection } from 'typeorm';
+import { createConnection, getConnectionOptions } from 'typeorm';
 
-createConnection();
+async function connect() {
+  const defaultOptions = await getConnectionOptions();
+  createConnection(
+    Object.assign(defaultOptions, {
+      database:
+        process.env.NODE_ENV === 'test'
+          ? 'rentx_test'
+          : defaultOptions.database,
+    })
+  );
+}
+
+connect();
