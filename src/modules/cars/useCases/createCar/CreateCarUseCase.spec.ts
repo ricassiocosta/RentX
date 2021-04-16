@@ -23,19 +23,19 @@ describe('Create car', () => {
     });
   });
 
-  it('should not to be able to register an already registered car', () => {
-    expect(async () => {
-      await createCarUseCase.execute({
-        name: 'Car name',
-        brand: 'Car brand',
-        category_id: 'category_id',
-        daily_rate: 100,
-        description: 'Car description',
-        fine_amount: 100,
-        license_plate: 'CAR1234',
-      });
+  it('should not to be able to register an already registered car', async () => {
+    await createCarUseCase.execute({
+      name: 'Car name',
+      brand: 'Car brand',
+      category_id: 'category_id',
+      daily_rate: 100,
+      description: 'Car description',
+      fine_amount: 100,
+      license_plate: 'CAR1234',
+    });
 
-      await createCarUseCase.execute({
+    await expect(
+      createCarUseCase.execute({
         name: 'Duplicated car',
         brand: 'Car brand',
         category_id: 'category_id',
@@ -43,8 +43,8 @@ describe('Create car', () => {
         description: 'Car description',
         fine_amount: 100,
         license_plate: 'CAR1234',
-      });
-    }).rejects.toBeInstanceOf(AppError);
+      })
+    ).rejects.toEqual(new AppError('Car already registered'));
   });
 
   it('should only be able to create a available car', async () => {

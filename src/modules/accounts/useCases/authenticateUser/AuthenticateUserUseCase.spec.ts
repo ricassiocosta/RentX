@@ -36,48 +36,47 @@ describe('Authenticate user', () => {
     expect(result).toHaveProperty('token');
   });
 
-  it('should not be able to authenticate an non-existent user', () => {
-    expect(async () => {
-      await authenticateUserUseCase.execute({
+  it('should not be able to authenticate an non-existent user', async () => {
+    await expect(
+      authenticateUserUseCase.execute({
         email: 'wrong@email.com',
         password: 'wrong_password',
-      });
-    }).rejects.toBeInstanceOf(AppError);
+      })
+    ).rejects.toEqual(new AppError('Email or password incorrect!'));
   });
 
-  it('should not be able to authenticate with incorrent password', () => {
-    expect(async () => {
-      const user: ICreateUserDTO = {
-        name: 'Tester It',
-        email: 'tester@test.com',
-        password: '123567',
-        driver_license: 'XPTO',
-      };
+  it('should not be able to authenticate with incorrent password', async () => {
+    const user: ICreateUserDTO = {
+      name: 'Tester It',
+      email: 'tester@test.com',
+      password: '123567',
+      driver_license: 'XPTO',
+    };
 
-      await createUserUseCase.execute(user);
+    await createUserUseCase.execute(user);
 
-      await authenticateUserUseCase.execute({
+    await expect(
+      authenticateUserUseCase.execute({
         email: user.email,
         password: 'wrong_password',
-      });
-    }).rejects.toBeInstanceOf(AppError);
+      })
+    ).rejects.toEqual(new AppError('Email or password incorrect!'));
   });
 
-  it('should not be able to authenticate with incorrent email', () => {
-    expect(async () => {
-      const user: ICreateUserDTO = {
-        name: 'Tester It',
-        email: 'tester@test.com',
-        password: '123567',
-        driver_license: 'XPTO',
-      };
+  it('should not be able to authenticate with incorrent email', async () => {
+    const user: ICreateUserDTO = {
+      name: 'Tester It',
+      email: 'tester@test.com',
+      password: '123567',
+      driver_license: 'XPTO',
+    };
 
-      await createUserUseCase.execute(user);
-
-      await authenticateUserUseCase.execute({
+    await createUserUseCase.execute(user);
+    expect(
+      authenticateUserUseCase.execute({
         email: 'wrong@email.com',
         password: user.password,
-      });
-    }).rejects.toBeInstanceOf(AppError);
+      })
+    ).rejects.toEqual(new AppError('Email or password incorrect!'));
   });
 });
