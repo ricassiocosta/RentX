@@ -26,6 +26,7 @@ class CarsRepositoryInMemory implements ICarsRepository {
       daily_rate,
       name,
       id,
+      available: true,
     });
 
     this.cars.push(car);
