@@ -1,7 +1,7 @@
 import auth from '@config/auth';
 import { IUserTokensRepository } from '@modules/accounts/repositories/IUserTokensRepository';
 import { sign, verify } from 'jsonwebtoken';
-import { inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { AppError } from '@shared/errors/AppError';
 import { IDateProvider } from '@shared/providers/DateProvider/IDateProvider';
@@ -11,6 +11,7 @@ interface IDecodedToken {
   email: string;
 }
 
+@injectable()
 class RefreshTokenUserCase {
   constructor(
     @inject('UsersTokensRepository')
