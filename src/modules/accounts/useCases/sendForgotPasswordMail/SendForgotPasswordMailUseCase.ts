@@ -5,6 +5,7 @@ import { v4 as uuidV4 } from 'uuid';
 
 import { AppError } from '@shared/errors/AppError';
 import { IDateProvider } from '@shared/providers/DateProvider/IDateProvider';
+import { IMailProvider } from '@shared/providers/MailProvider/IMailProvider';
 
 @injectable()
 class SendForgotPasswordMailUseCase {
@@ -14,10 +15,12 @@ class SendForgotPasswordMailUseCase {
     @inject('UsersTokensRepository')
     private usersTokensRepository: IUserTokensRepository,
     @inject('DateProvider')
-    private dateProvider: IDateProvider
+    private dateProvider: IDateProvider,
+    @inject('MailProvider')
+    private mailProvider: IMailProvider
   ) {}
 
-  async execute(email: string) {
+  async execute(email: string): Promise<void> {
     const user = await this.usersRepository.findByEmail(email);
 
     if (!user) {
@@ -33,6 +36,12 @@ class SendForgotPasswordMailUseCase {
       user_id: user.id,
       expires_date,
     });
+
+    await this.mailProvider.sendMail(
+      email,
+      'Recuperação de senha',
+      `O link para o reset é ${token}`
+    );
   }
 }
 
