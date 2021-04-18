@@ -39,7 +39,7 @@ describe('List categories', () => {
       password: 'admin',
     });
 
-    const { token } = response.body;
+    const { refresh_token } = response.body;
 
     await request(app)
       .post('/categories')
@@ -48,7 +48,7 @@ describe('List categories', () => {
         description: 'category 1 description',
       })
       .set({
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${refresh_token}`,
       });
 
     await request(app)
@@ -58,10 +58,8 @@ describe('List categories', () => {
         description: 'category 2 description',
       })
       .set({
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${refresh_token}`,
       });
-
-    await delay(100);
 
     response = await request(app).get('/categories');
 
