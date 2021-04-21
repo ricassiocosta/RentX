@@ -57,7 +57,7 @@ class RefreshTokenUserCase {
       user_id,
     });
 
-    const newToken = sign({ email }, auth.secret_refresh_token, {
+    const newToken = sign({ email }, auth.secret_token, {
       subject: user_id,
       expiresIn: auth.expires_in_token,
     });
