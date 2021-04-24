@@ -1,7 +1,6 @@
 node_modules/
 dist/
 .vscode/
-tmp/avatar/*
-tmp/cars/*
+tmp/*
 coverage/
 .env
